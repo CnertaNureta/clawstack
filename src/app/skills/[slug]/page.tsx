@@ -177,6 +177,28 @@ export default async function SkillDetailPage({ params }: Props) {
             )}
           </div>
 
+          {/* ClawHub comparison callout */}
+          <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/[0.03] p-5">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  On ClawHub, this skill has no security information.
+                </p>
+                <p className="mt-0.5 text-xs text-muted">
+                  ClawStack independently scans every skill for permissions, network requests, author reputation, and more.{" "}
+                  <Link href="/security" className="font-medium text-primary hover:underline">
+                    Learn how we score &rarr;
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Security Details */}
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center justify-between">

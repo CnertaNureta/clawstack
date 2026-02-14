@@ -1,6 +1,17 @@
 import Link from "next/link";
-import { Skill, CATEGORIES } from "@/lib/supabase/types";
+import { Skill, CATEGORIES, SecurityGrade } from "@/lib/supabase/types";
 import { SecurityBadge } from "./SecurityBadge";
+
+function gradeLeftBorder(grade: SecurityGrade | null): string {
+  switch (grade) {
+    case "S": return "border-l-emerald-500";
+    case "A": return "border-l-green-500";
+    case "B": return "border-l-yellow-500";
+    case "C": return "border-l-orange-500";
+    case "D": return "border-l-red-500";
+    default:  return "border-l-gray-300";
+  }
+}
 
 interface SkillCardProps {
   skill: Skill;
@@ -13,7 +24,7 @@ export function SkillCard({ skill, rank }: SkillCardProps) {
   return (
     <Link
       href={`/skills/${skill.slug}`}
-      className="group relative flex flex-col rounded-xl border border-border bg-card p-5 shadow-sm hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5"
+      className={`group relative flex flex-col rounded-xl border border-border border-l-4 ${gradeLeftBorder(skill.security_grade)} bg-card p-5 shadow-sm hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5`}
       style={{ transition: "transform 150ms ease, box-shadow 150ms ease" }}
     >
       {/* Rank badge */}

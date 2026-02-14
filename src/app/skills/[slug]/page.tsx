@@ -29,11 +29,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${skill.name} for OpenClaw`,
       description: skill.description || skill.name,
-      images: [
-        `/api/og?type=skill&slug=${slug}`,
-      ],
+      images: [`/api/og?type=skill&slug=${slug}`],
     },
   };
+}
+
+const scoreMaxMap: Record<string, number> = {
+  networkScore: 15,
+  communityScore: 10,
+  permissionScore: 20,
+  virusTotalScore: 30,
+  authorTrustScore: 15,
+  auditabilityScore: 10,
+};
+
+const scoreLabelMap: Record<string, string> = {
+  networkScore: "Network Safety",
+  communityScore: "Community Trust",
+  permissionScore: "Permissions",
+  virusTotalScore: "Virus Scan",
+  authorTrustScore: "Author Reputation",
+  auditabilityScore: "Auditability",
+};
+
+function getBarColor(value: number, max: number) {
+  const pct = value / max;
+  if (pct >= 0.8) return "bg-emerald-500";
+  if (pct >= 0.6) return "bg-green-500";
+  if (pct >= 0.4) return "bg-yellow-500";
+  if (pct >= 0.2) return "bg-orange-500";
+  return "bg-red-500";
 }
 
 export default async function SkillDetailPage({ params }: Props) {
@@ -50,7 +75,6 @@ export default async function SkillDetailPage({ params }: Props) {
 
   const typedSkill = skill as Skill;
 
-  // Fetch reviews
   const { data: reviews } = await supabase
     .from("reviews")
     .select("*, user:users(username, avatar_url)")
@@ -58,7 +82,6 @@ export default async function SkillDetailPage({ params }: Props) {
     .order("created_at", { ascending: false })
     .limit(20);
 
-  // Fetch similar skills
   const { data: similarSkills } = await supabase
     .from("skills")
     .select("*")
@@ -75,30 +98,30 @@ export default async function SkillDetailPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-muted">
-        <Link href="/skills" className="hover:text-foreground">
+      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted">
+        <Link href="/skills" className="hover:text-primary">
           Skills
         </Link>
-        <span className="mx-2">/</span>
+        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
         <Link
           href={`/skills?category=${typedSkill.category}`}
-          className="hover:text-foreground"
+          className="hover:text-primary"
         >
           {categoryInfo?.label || typedSkill.category}
         </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">{typedSkill.name}</span>
+        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+        <span className="font-medium text-foreground">{typedSkill.name}</span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main content */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           {/* Header */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-foreground">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
                     {typedSkill.name}
                   </h1>
                   <SecurityBadge
@@ -107,20 +130,25 @@ export default async function SkillDetailPage({ params }: Props) {
                     showLabel
                   />
                 </div>
-                <p className="mt-1 text-sm text-muted">
-                  {categoryInfo?.emoji} {categoryInfo?.label} &middot;
-                  {typedSkill.author_name && ` by ${typedSkill.author_name}`}
+                <p className="mt-2 text-sm text-muted">
+                  {categoryInfo?.emoji} {categoryInfo?.label}
+                  {typedSkill.author_name && (
+                    <> &middot; by <span className="font-medium text-foreground">{typedSkill.author_name}</span></>
+                  )}
                 </p>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-foreground">
-                  {typedSkill.upvotes}
+              <div className="shrink-0 text-center">
+                <div className="flex items-center gap-1.5">
+                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
+                  </svg>
+                  <span className="text-2xl font-bold text-foreground">{typedSkill.upvotes}</span>
                 </div>
                 <div className="text-xs text-muted">upvotes</div>
               </div>
             </div>
 
-            <p className="mt-4 text-foreground">
+            <p className="mt-4 leading-relaxed text-foreground/80">
               {typedSkill.description || "No description available."}
             </p>
 
@@ -130,7 +158,7 @@ export default async function SkillDetailPage({ params }: Props) {
                 {typedSkill.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-background px-3 py-1 text-xs text-muted"
+                    className="rounded-full bg-primary/5 px-3 py-1 text-xs font-medium text-primary-dark"
                   >
                     {tag}
                   </span>
@@ -150,60 +178,69 @@ export default async function SkillDetailPage({ params }: Props) {
           </div>
 
           {/* Security Details */}
-          <div className="mt-6 rounded-xl border border-border bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground">
-              Security Analysis
-            </h2>
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground">
+                Security Analysis
+              </h2>
+              {typedSkill.security_grade && (
+                <span className="text-sm text-muted">
+                  Score: <span className="font-semibold text-foreground">{typedSkill.security_score}</span>/100
+                </span>
+              )}
+            </div>
             {typedSkill.security_grade ? (
-              <div className="mt-4">
-                <div className="mb-4 flex items-center gap-3">
+              <div className="mt-5">
+                <div className="mb-5 flex items-center gap-3">
                   <SecurityBadge
                     grade={typedSkill.security_grade}
                     size="lg"
                     showLabel
                   />
-                  <span className="text-sm text-muted">
-                    Score: {typedSkill.security_score}/100
-                  </span>
                 </div>
                 {typedSkill.security_details &&
                   Object.keys(typedSkill.security_details).length > 0 && (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {Object.entries(typedSkill.security_details).map(
-                        ([key, value]) => (
-                          <div key={key}>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-muted capitalize">
-                                {key.replace(/([A-Z])/g, " $1").trim()}
-                              </span>
-                              <span className="font-medium text-foreground">
-                                {value as number}
-                              </span>
+                        ([key, value]) => {
+                          const max = scoreMaxMap[key] || 30;
+                          const pct = Math.min(((value as number) / max) * 100, 100);
+                          return (
+                            <div key={key}>
+                              <div className="mb-1.5 flex justify-between text-sm">
+                                <span className="font-medium text-foreground">
+                                  {scoreLabelMap[key] || key.replace(/([A-Z])/g, " $1").trim()}
+                                </span>
+                                <span className="tabular-nums text-muted">
+                                  {value as number}/{max}
+                                </span>
+                              </div>
+                              <div className="h-2.5 overflow-hidden rounded-full bg-border/50">
+                                <div
+                                  className={`h-full rounded-full ${getBarColor(value as number, max)}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
                             </div>
-                            <div className="mt-1 h-2 rounded-full bg-background">
-                              <div
-                                className="h-2 rounded-full bg-primary"
-                                style={{
-                                  width: `${Math.min((value as number) * 100 / 30, 100)}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        )
+                          );
+                        }
                       )}
                     </div>
                   )}
               </div>
             ) : (
-              <p className="mt-2 text-sm text-muted">
-                This skill has not been security-rated yet.
-              </p>
+              <div className="mt-4 flex items-center gap-3 rounded-lg bg-background p-4">
+                <svg className="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p className="text-sm text-muted">
+                  This skill has not been security-rated yet.
+                </p>
+              </div>
             )}
           </div>
 
           {/* Reviews */}
-          <div className="mt-6 rounded-xl border border-border bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-foreground">
               Reviews ({typedSkill.review_count})
             </h2>
             {reviews && reviews.length > 0 ? (
@@ -211,7 +248,7 @@ export default async function SkillDetailPage({ params }: Props) {
                 {reviews.map((review: Review & { user?: { username: string; avatar_url: string } }) => (
                   <div
                     key={review.id}
-                    className="border-b border-border pb-4 last:border-0"
+                    className="border-b border-border/50 pb-4 last:border-0"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-foreground">
@@ -219,11 +256,11 @@ export default async function SkillDetailPage({ params }: Props) {
                       </span>
                       <span className="text-sm text-accent">
                         {"★".repeat(review.rating)}
-                        {"☆".repeat(5 - review.rating)}
+                        <span className="text-border">{"★".repeat(5 - review.rating)}</span>
                       </span>
                     </div>
                     {review.comment && (
-                      <p className="mt-1 text-sm text-muted">
+                      <p className="mt-1 text-sm leading-relaxed text-muted">
                         {review.comment}
                       </p>
                     )}
@@ -231,9 +268,11 @@ export default async function SkillDetailPage({ params }: Props) {
                 ))}
               </div>
             ) : (
-              <p className="mt-2 text-sm text-muted">
-                No reviews yet. Be the first to review this skill!
-              </p>
+              <div className="mt-4 flex flex-col items-center rounded-lg bg-background py-8 text-center">
+                <svg className="h-10 w-10 text-border" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <p className="mt-3 text-sm font-medium text-muted">No reviews yet</p>
+                <p className="mt-1 text-xs text-muted/70">Be the first to review this skill!</p>
+              </div>
             )}
           </div>
         </div>
@@ -241,18 +280,18 @@ export default async function SkillDetailPage({ params }: Props) {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Quick info */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h3 className="text-sm font-semibold text-foreground">Details</h3>
-            <dl className="mt-3 space-y-3 text-sm">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h3 className="text-sm font-bold text-foreground">Details</h3>
+            <dl className="mt-4 space-y-4 text-sm">
               {typedSkill.author_github && (
-                <div>
+                <div className="flex items-center justify-between">
                   <dt className="text-muted">Author</dt>
                   <dd>
                     <a
                       href={`https://github.com/${typedSkill.author_github}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline"
+                      className="font-medium text-primary hover:underline"
                     >
                       @{typedSkill.author_github}
                     </a>
@@ -260,47 +299,46 @@ export default async function SkillDetailPage({ params }: Props) {
                 </div>
               )}
               {typedSkill.repo_url && (
-                <div>
-                  <dt className="text-muted">Source Code</dt>
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Source</dt>
                   <dd>
                     <a
                       href={typedSkill.repo_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline"
+                      className="font-medium text-primary hover:underline"
                     >
-                      View on GitHub
+                      GitHub
                     </a>
                   </dd>
                 </div>
               )}
               {typedSkill.clawhub_url && (
-                <div>
+                <div className="flex items-center justify-between">
                   <dt className="text-muted">ClawHub</dt>
                   <dd>
                     <a
                       href={typedSkill.clawhub_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline"
+                      className="font-medium text-primary hover:underline"
                     >
-                      View on ClawHub
+                      View
                     </a>
                   </dd>
                 </div>
               )}
-              <div>
+              <div className="flex items-center justify-between">
                 <dt className="text-muted">Category</dt>
-                <dd className="text-foreground">
+                <dd className="font-medium text-foreground">
                   {categoryInfo?.emoji} {categoryInfo?.label}
                 </dd>
               </div>
               {typedSkill.avg_rating > 0 && (
-                <div>
+                <div className="flex items-center justify-between">
                   <dt className="text-muted">Rating</dt>
-                  <dd className="text-foreground">
-                    ★ {typedSkill.avg_rating.toFixed(1)} ({typedSkill.review_count}{" "}
-                    reviews)
+                  <dd className="font-medium text-foreground">
+                    <span className="text-accent">★</span> {typedSkill.avg_rating.toFixed(1)} ({typedSkill.review_count})
                   </dd>
                 </div>
               )}
@@ -310,7 +348,7 @@ export default async function SkillDetailPage({ params }: Props) {
           {/* Similar skills */}
           {similarSkills && similarSkills.length > 0 && (
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-foreground">
+              <h3 className="mb-4 text-sm font-bold text-foreground">
                 Similar Skills
               </h3>
               <div className="space-y-3">

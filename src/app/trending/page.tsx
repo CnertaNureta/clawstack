@@ -36,13 +36,15 @@ export default async function TrendingPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-foreground">Rankings</h1>
-      <p className="mt-1 text-muted">
-        Updated daily. See what the community trusts most.
-      </p>
+      <div className="mb-2">
+        <h1 className="text-3xl font-bold text-foreground">Rankings</h1>
+        <p className="mt-1 text-muted">
+          Updated daily. See what the community trusts most.
+        </p>
+      </div>
 
       {/* Tabs */}
-      <div className="mt-6 flex gap-2 border-b border-border">
+      <div className="mt-6 flex gap-1 border-b border-border">
         {tabs.map((t) => (
           <Link
             key={t.key}
@@ -59,14 +61,9 @@ export default async function TrendingPage({ searchParams }: Props) {
       </div>
 
       {/* List */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {(skills as Skill[] | null)?.map((skill, i) => (
-          <div key={skill.id} className="relative">
-            <div className="absolute -left-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-              {i + 1}
-            </div>
-            <SkillCard skill={skill} />
-          </div>
+          <SkillCard key={skill.id} skill={skill} rank={i + 1} />
         ))}
       </div>
     </div>

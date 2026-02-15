@@ -86,7 +86,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Stat: Total Scanned */}
-            <div className="rounded-xl border border-border bg-background p-5">
+            <Link href="/skills" className="group rounded-xl border border-border bg-background p-5 hover:border-primary/40 hover:shadow-md" style={{ transition: "box-shadow 150ms ease, border-color 150ms ease" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -95,13 +95,13 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-foreground">{total.toLocaleString()}</div>
-                  <div className="text-xs text-muted">Skills Scanned</div>
+                  <div className="text-xs text-muted">Skills Scanned <span className="text-primary opacity-0 group-hover:opacity-100">&rarr;</span></div>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* Stat: Malicious Flagged */}
-            <div className="rounded-xl border border-red-200 bg-red-50 p-5">
+            <Link href="/skills?grade=D&sort=security" className="group rounded-xl border border-red-200 bg-red-50 p-5 hover:border-red-400 hover:shadow-md" style={{ transition: "box-shadow 150ms ease, border-color 150ms ease" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
                   <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -110,13 +110,13 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-red-700">{malicious}</div>
-                  <div className="text-xs text-red-600/80">Flagged Dangerous</div>
+                  <div className="text-xs text-red-600/80">Flagged Dangerous <span className="text-red-500 opacity-0 group-hover:opacity-100">&rarr;</span></div>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* Stat: Risk Percentage */}
-            <div className="rounded-xl border border-orange-200 bg-orange-50 p-5">
+            <Link href="/skills?grade=C,D&sort=security" className="group rounded-xl border border-orange-200 bg-orange-50 p-5 hover:border-orange-400 hover:shadow-md" style={{ transition: "box-shadow 150ms ease, border-color 150ms ease" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100">
                   <svg className="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -125,13 +125,13 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-orange-700">{riskPct}%</div>
-                  <div className="text-xs text-orange-600/80">Have Risk Flags</div>
+                  <div className="text-xs text-orange-600/80">Have Risk Flags <span className="text-orange-500 opacity-0 group-hover:opacity-100">&rarr;</span></div>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* Stat: Safe Skills */}
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+            <Link href="/skills?grade=S,A&sort=security" className="group rounded-xl border border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-400 hover:shadow-md" style={{ transition: "box-shadow 150ms ease, border-color 150ms ease" }}>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
                   <svg className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor">
@@ -140,10 +140,10 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-emerald-700">{safe.toLocaleString()}</div>
-                  <div className="text-xs text-emerald-600/80">Rated Safe (S/A)</div>
+                  <div className="text-xs text-emerald-600/80">Rated Safe (S/A) <span className="text-emerald-500 opacity-0 group-hover:opacity-100">&rarr;</span></div>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* CTA row */}

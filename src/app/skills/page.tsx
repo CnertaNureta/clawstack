@@ -16,16 +16,26 @@ interface Props {
     q?: string;
     category?: Category;
     security_grade?: SecurityGrade;
+    grade?: string;
     sort?: string;
     page?: string;
   }>;
 }
+
+const GRADE_LABELS: Record<string, string> = {
+  S: "Grade S (Excellent)",
+  A: "Grade A (Good)",
+  B: "Grade B (Fair)",
+  C: "Grade C (Caution)",
+  D: "Grade D (Risk)",
+};
 
 export default async function SkillsPage({ searchParams }: Props) {
   const params = await searchParams;
   const q = params.q;
   const category = params.category;
   const securityGrade = params.security_grade;
+  const gradeFilter = params.grade;
   const sort = params.sort || "upvotes";
   const page = parseInt(params.page || "1");
   const limit = 24;
@@ -40,7 +50,10 @@ export default async function SkillsPage({ searchParams }: Props) {
   if (category) {
     query = query.eq("category", category);
   }
-  if (securityGrade) {
+  if (gradeFilter) {
+    const grades = gradeFilter.split(",").map((g) => g.trim());
+    query = query.in("security_grade", grades);
+  } else if (securityGrade) {
     query = query.eq("security_grade", securityGrade);
   }
 
@@ -76,13 +89,30 @@ export default async function SkillsPage({ searchParams }: Props) {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-foreground">
-          {q ? `Results for "${q}"` : "All OpenClaw Skills"}
+          {q ? `Results for "${q}"` : gradeFilter ? "Filtered by Security Grade" : "All OpenClaw Skills"}
         </h1>
         <p className="mt-1 text-muted">
           {count ?? 0} skills found
           {category ? ` in ${category}` : ""}
         </p>
       </div>
+
+      {/* Grade filter badge */}
+      {gradeFilter && (
+        <div className="mb-6 flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+          <span className="text-sm text-muted">Showing:</span>
+          <div className="flex gap-2">
+            {gradeFilter.split(",").map((g) => (
+              <span key={g} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {GRADE_LABELS[g.trim()] || g}
+              </span>
+            ))}
+          </div>
+          <Link href="/skills" className="ml-auto text-xs text-muted hover:text-foreground">
+            Clear filter
+          </Link>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="mb-6">

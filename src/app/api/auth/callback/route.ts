@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -11,9 +12,10 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Create/update user in our users table
+      // Create/update user in our users table (use admin client to bypass RLS)
+      const admin = createAdminClient();
       const ghUser = data.user.user_metadata;
-      await supabase.from("users").upsert(
+      const { error: upsertError } = await admin.from("users").upsert(
         {
           github_id: ghUser.user_name || data.user.id,
           username: ghUser.user_name || ghUser.preferred_username || data.user.id,
@@ -22,6 +24,10 @@ export async function GET(request: NextRequest) {
         },
         { onConflict: "github_id" }
       );
+
+      if (upsertError) {
+        console.error("User upsert error:", upsertError);
+      }
 
       return NextResponse.redirect(`${origin}${next}`);
     }

@@ -38,18 +38,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const supabase = createClient();
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       setUser(user);
       if (user) {
-        supabase
+        const githubId = user.user_metadata?.user_name || user.id;
+        const { data } = await supabase
           .from("users")
           .select("id, username, avatar_url")
-          .eq("github_id", user.user_metadata?.user_name || user.id)
-          .single()
-          .then(({ data }) => {
-            setDbUser(data as DbUser | null);
-            setLoading(false);
-          });
+          .eq("github_id", githubId)
+          .single();
+
+        if (data) {
+          setDbUser(data as DbUser);
+        } else {
+          // User record missing — create via server API (bypasses RLS)
+          try {
+            const res = await fetch("/api/auth/ensure-user", { method: "POST" });
+            if (res.ok) {
+              const created = await res.json();
+              setDbUser(created as DbUser);
+            }
+          } catch {
+            // ignore — user will see Sign In button
+          }
+        }
+        setLoading(false);
       } else {
         setLoading(false);
       }

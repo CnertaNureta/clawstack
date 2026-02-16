@@ -31,12 +31,16 @@ export function AddToStackButton({ skillId }: AddToStackButtonProps) {
   const handleToggle = async () => {
     if (!user) {
       const supabase = createClient();
-      await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
           redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
+          skipBrowserRedirect: true,
         },
       });
+      if (!error && data?.url) {
+        window.location.href = data.url;
+      }
       return;
     }
 

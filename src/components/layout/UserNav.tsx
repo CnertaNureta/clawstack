@@ -23,13 +23,28 @@ export function UserNav() {
 
   const handleSignIn = async () => {
     setSigningIn(true);
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: `${window.location.origin}/api/auth/callback`,
+          skipBrowserRedirect: true,
+        },
+      });
+      if (error) {
+        console.error("OAuth error:", error);
+        alert(`Sign in failed: ${error.message}`);
+        setSigningIn(false);
+        return;
+      }
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Sign in error:", err);
+      setSigningIn(false);
+    }
   };
 
   if (loading) {

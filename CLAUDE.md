@@ -115,8 +115,8 @@ Grades: S / A / B / C / D displayed as badge on each skill card
 - [x] Day 8: Skill Recommendation Wizard (Quiz)
 
 ### Phase 3: SEO & Content (Feb 17-19, 3 days)
-- [ ] Day 9: SEO optimization (meta tags, sitemap, structured data)
-- [ ] Day 10: Create 20+ curated collections
+- [x] Day 9: SEO optimization (meta tags, sitemap, structured data, robots.txt, JSON-LD)
+- [x] Day 10: Create 22 curated collections + 11 category pages + 5 grade pages
 - [ ] Day 11: Submit to Google Search Console + Bing
 
 ### Phase 4: Growth Sprint (Feb 20-28, 9 days)

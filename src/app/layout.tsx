@@ -46,8 +46,30 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "ClawStack",
+    url: baseUrl,
+    description:
+      "The trusted way to discover, rate, and share OpenClaw skills. Security ratings for 5,700+ skills.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${baseUrl}/skills?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >

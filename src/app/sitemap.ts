@@ -1,5 +1,8 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { CATEGORIES } from "@/lib/supabase/types";
+
+const GRADES = ["s", "a", "b", "c", "d"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
@@ -12,7 +15,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/trending`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${baseUrl}/collections`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/quiz`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/security`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
   ];
+
+  // Category landing pages
+  const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
+    url: `${baseUrl}/categories/${c.value}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  // Grade landing pages
+  const gradePages: MetadataRoute.Sitemap = GRADES.map((g) => ({
+    url: `${baseUrl}/grade/${g}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   // All skill pages
   const { data: skills } = await supabase
@@ -50,5 +70,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...skillPages, ...collectionPages, ...userPages];
+  return [...staticPages, ...categoryPages, ...gradePages, ...skillPages, ...collectionPages, ...userPages];
 }

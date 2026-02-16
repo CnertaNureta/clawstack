@@ -96,8 +96,36 @@ export default async function SkillDetailPage({ params }: Props) {
     (g) => g.grade === typedSkill.security_grade
   );
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: typedSkill.name,
+    description: typedSkill.description || typedSkill.name,
+    applicationCategory: categoryInfo?.label || typedSkill.category,
+    operatingSystem: "OpenClaw",
+    author: typedSkill.author_name
+      ? { "@type": "Person", name: typedSkill.author_name }
+      : undefined,
+    aggregateRating:
+      typedSkill.review_count > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: typedSkill.avg_rating,
+            reviewCount: typedSkill.review_count,
+            bestRating: 5,
+            worstRating: 1,
+          }
+        : undefined,
+    url: `${baseUrl}/skills/${typedSkill.slug}`,
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted">
         <Link href="/skills" className="hover:text-primary">

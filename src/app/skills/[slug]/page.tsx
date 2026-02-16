@@ -39,6 +39,7 @@ const scoreMaxMap: Record<string, number> = {
   networkScore: 15,
   communityScore: 10,
   permissionScore: 20,
+  scanScore: 30,
   virusTotalScore: 30,
   authorTrustScore: 15,
   auditabilityScore: 10,
@@ -48,7 +49,8 @@ const scoreLabelMap: Record<string, string> = {
   networkScore: "Network Safety",
   communityScore: "Community Trust",
   permissionScore: "Permissions",
-  virusTotalScore: "Virus Scan",
+  scanScore: "Security Scan",
+  virusTotalScore: "Security Scan",
   authorTrustScore: "Author Reputation",
   auditabilityScore: "Auditability",
 };
@@ -252,8 +254,9 @@ export default async function SkillDetailPage({ params }: Props) {
                 {typedSkill.security_details &&
                   Object.keys(typedSkill.security_details).length > 0 && (
                     <div className="space-y-4">
-                      {Object.entries(typedSkill.security_details).map(
-                        ([key, value]) => {
+                      {Object.entries(typedSkill.security_details)
+                        .filter(([key]) => key in scoreMaxMap)
+                        .map(([key, value]) => {
                           const max = scoreMaxMap[key] || 30;
                           const pct = Math.min(((value as number) / max) * 100, 100);
                           return (

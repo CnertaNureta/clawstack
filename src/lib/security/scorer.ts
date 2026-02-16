@@ -1,5 +1,11 @@
 import type { SecurityGrade } from "@/lib/supabase/types";
 
+export interface ScanFindingsSummary {
+  totalFindings: number;
+  highestSeverity: "HIGH" | "MEDIUM" | "LOW" | "SAFE";
+  threatNames: string[];
+}
+
 export interface SecurityScoreInput {
   skillMdContent: string;
   authorGithub: string | null;
@@ -8,7 +14,8 @@ export interface SecurityScoreInput {
   authorFollowers?: number;
   authorPublicRepos?: number;
   communityVotes?: { safe: number; suspicious: number };
-  virusTotalDetections?: number;
+  scanFindings?: ScanFindingsSummary;
+  virusTotalDetections?: number; // backward compat
 }
 
 export interface SecurityScoreOutput {
@@ -20,7 +27,7 @@ export interface SecurityScoreOutput {
     networkScore: number;
     communityScore: number;
     auditabilityScore: number;
-    virusTotalScore: number;
+    scanScore: number;
   };
 }
 
@@ -114,12 +121,36 @@ function scoreAuditability(repoUrl: string | null): number {
   return 5;
 }
 
-function scoreVirusTotal(detections?: number): number {
-  if (detections === undefined) return 15; // Not yet scanned, give partial credit
-  if (detections === 0) return 30;
-  if (detections === 1) return 20;
-  if (detections === 2) return 10;
-  return 0;
+function scoreScan(scanFindings?: ScanFindingsSummary, virusTotalDetections?: number): number {
+  // Prefer real scan findings from mcp-scanner
+  if (scanFindings) {
+    if (scanFindings.highestSeverity === "SAFE" || scanFindings.totalFindings === 0) return 30;
+    const n = scanFindings.totalFindings;
+    switch (scanFindings.highestSeverity) {
+      case "HIGH":
+        if (n >= 3) return 0;
+        if (n === 2) return 5;
+        return 10;
+      case "MEDIUM":
+        if (n >= 3) return 10;
+        if (n === 2) return 15;
+        return 20;
+      case "LOW":
+        if (n >= 5) return 15;
+        if (n >= 2) return 20;
+        return 25;
+    }
+  }
+
+  // Fallback: legacy virusTotal detections
+  if (virusTotalDetections !== undefined) {
+    if (virusTotalDetections === 0) return 30;
+    if (virusTotalDetections === 1) return 20;
+    if (virusTotalDetections === 2) return 10;
+    return 0;
+  }
+
+  return 15; // Not yet scanned, give partial credit
 }
 
 function gradeFromScore(score: number): SecurityGrade {
@@ -139,7 +170,7 @@ export function computeSecurityScore(
     networkScore: scoreNetwork(input.skillMdContent),
     communityScore: scoreCommunity(input.communityVotes),
     auditabilityScore: scoreAuditability(input.repoUrl),
-    virusTotalScore: scoreVirusTotal(input.virusTotalDetections),
+    scanScore: scoreScan(input.scanFindings, input.virusTotalDetections),
   };
 
   const score = Object.values(details).reduce((sum, v) => sum + v, 0);

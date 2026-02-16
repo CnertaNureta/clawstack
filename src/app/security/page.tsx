@@ -239,9 +239,9 @@ export default async function SecurityReportPage() {
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ScoreDimension
-            title="Virus Scan"
+            title="Security Scan"
             points="30 pts"
-            description="VirusTotal scan results. Zero detections = full score."
+            description="Cisco mcp-scanner YARA analysis. Detects prompt injection, data exfiltration, credential harvesting, and more."
             color="text-red-600"
           />
           <ScoreDimension

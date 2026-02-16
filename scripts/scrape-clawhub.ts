@@ -126,12 +126,12 @@ function quickSecurityScore(content: string, hasRepo: boolean): { grade: string;
   const auditabilityScore = hasRepo ? 10 : 2;
   const authorTrustScore = 8;
   const communityScore = 5;
-  const virusTotalScore = 15;
+  const scanScore = 15;
 
-  const score = permissionScore + networkScore + auditabilityScore + authorTrustScore + communityScore + virusTotalScore;
+  const score = permissionScore + networkScore + auditabilityScore + authorTrustScore + communityScore + scanScore;
   const grade = score >= 90 ? "S" : score >= 75 ? "A" : score >= 60 ? "B" : score >= 40 ? "C" : "D";
 
-  return { grade, score, details: { permissionScore, authorTrustScore, networkScore, communityScore, auditabilityScore, virusTotalScore } };
+  return { grade, score, details: { permissionScore, authorTrustScore, networkScore, communityScore, auditabilityScore, scanScore } };
 }
 
 async function main() {

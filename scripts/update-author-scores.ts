@@ -208,7 +208,7 @@ async function main() {
       (details.networkScore ?? 10) +
       (details.communityScore ?? 5) +
       (details.auditabilityScore ?? 2) +
-      (details.virusTotalScore ?? 15);
+      (details.scanScore ?? details.virusTotalScore ?? 15);
 
     const newGrade = gradeFromScore(newScore);
     const oldGrade = gradeFromScore(skill.security_score);

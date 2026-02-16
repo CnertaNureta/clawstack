@@ -40,7 +40,7 @@ interface ScanFindingsSummary {
 }
 
 interface ToolResult {
-  name: string;
+  tool_name: string;
   is_safe: boolean;
   findings?: {
     yara_analyzer?: {
@@ -170,8 +170,8 @@ async function main() {
 
   console.log(`Collected content for ${skillContents.length} skills.\n`);
 
-  // 3. Batch scan with mcp-scanner (200 per batch)
-  const BATCH_SIZE = 200;
+  // 3. Batch scan with mcp-scanner (50 per batch to avoid buffer overflow)
+  const BATCH_SIZE = 50;
   const scanResults = new Map<string, ScanFindingsSummary>();
   const tmpDir = path.join(__dirname, ".tmp-scan");
   if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
@@ -188,7 +188,7 @@ async function main() {
     // Write batch as mcp-scanner static tools format
     const tools = batch.map((s) => ({
       name: s.slug,
-      description: s.content.slice(0, 50000), // cap content size
+      description: s.content.slice(0, 10000), // cap content size for YARA
       inputSchema: {},
     }));
     fs.writeFileSync(batchFile, JSON.stringify({ tools }, null, 2));
@@ -196,12 +196,12 @@ async function main() {
     console.log(`  Batch ${batchIdx + 1}/${totalBatches} (${batch.length} skills)...`);
 
     try {
+      // mcp-scanner outputs results to stdout; redirect to file
       execSync(
         `mcp-scanner --analyzers yara --format raw static --tools "${batchFile}" > "${outputFile}" 2>/dev/null`,
-        { timeout: 300000, stdio: "pipe" }
+        { timeout: 300000, stdio: ["pipe", "pipe", "pipe"], maxBuffer: 50 * 1024 * 1024 }
       );
 
-      // Parse output
       const rawOutput = fs.readFileSync(outputFile, "utf-8").trim();
       if (!rawOutput) {
         console.log(`    Warning: empty output, skipping batch`);
@@ -211,7 +211,7 @@ async function main() {
       let results: ToolResult[];
       try {
         const parsed = JSON.parse(rawOutput);
-        results = Array.isArray(parsed) ? parsed : parsed.tools || parsed.results || [];
+        results = parsed.scan_results || (Array.isArray(parsed) ? parsed : parsed.tools || parsed.results || []);
       } catch {
         console.log(`    Warning: failed to parse JSON output, skipping batch`);
         continue;
@@ -223,7 +223,7 @@ async function main() {
         const severity = (yara?.severity?.toUpperCase() || (result.is_safe ? "SAFE" : "LOW")) as ScanFindingsSummary["highestSeverity"];
         const threatNames = yara?.threat_names || [];
 
-        scanResults.set(result.name, {
+        scanResults.set(result.tool_name, {
           totalFindings,
           highestSeverity: totalFindings === 0 ? "SAFE" : severity,
           threatNames,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { createClient } from "@/lib/supabase/client";
 
 interface AddToStackButtonProps {
   skillId: string;
@@ -29,7 +30,13 @@ export function AddToStackButton({ skillId }: AddToStackButtonProps) {
 
   const handleToggle = async () => {
     if (!user) {
-      window.location.href = `/api/auth/callback?provider=github&next=${encodeURIComponent(window.location.pathname)}`;
+      const supabase = createClient();
+      await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
+        },
+      });
       return;
     }
 

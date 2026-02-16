@@ -110,9 +110,9 @@ Grades: S / A / B / C / D displayed as badge on each skill card
 
 ### Phase 2: Differentiating Features (Feb 13-16, 4 days)
 - [x] Day 5: GitHub OAuth login + user voting
-- [ ] Day 6: My Stack feature + profile page
-- [ ] Day 7: OG Image dynamic generation (share cards)
-- [ ] Day 8: Skill Recommendation Wizard (Quiz)
+- [x] Day 6: My Stack feature + profile page
+- [x] Day 7: OG Image dynamic generation (share cards)
+- [x] Day 8: Skill Recommendation Wizard (Quiz)
 
 ### Phase 3: SEO & Content (Feb 17-19, 3 days)
 - [ ] Day 9: SEO optimization (meta tags, sitemap, structured data)

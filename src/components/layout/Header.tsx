@@ -71,6 +71,12 @@ export function Header() {
           >
             Collections
           </Link>
+          <Link
+            href="/quiz"
+            className="hidden rounded-lg bg-indigo-500/10 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-500/20 sm:block"
+          >
+            Quiz
+          </Link>
           <UserNav />
         </nav>
       </div>

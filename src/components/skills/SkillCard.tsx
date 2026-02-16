@@ -24,7 +24,7 @@ export function SkillCard({ skill, rank }: SkillCardProps) {
   return (
     <Link
       href={`/skills/${skill.slug}`}
-      className={`group relative flex flex-col rounded-xl border border-border border-l-4 ${gradeLeftBorder(skill.security_grade)} bg-card p-5 shadow-sm hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5`}
+      className={`group relative flex cursor-pointer flex-col rounded-xl border border-border border-l-4 ${gradeLeftBorder(skill.security_grade)} bg-card p-5 shadow-sm hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5`}
       style={{ transition: "transform 150ms ease, box-shadow 150ms ease" }}
     >
       {/* Rank badge */}

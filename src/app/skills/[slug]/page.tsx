@@ -7,6 +7,7 @@ import { InstallCommand } from "@/components/skills/InstallCommand";
 import { SkillCard } from "@/components/skills/SkillCard";
 import { CATEGORIES, SECURITY_GRADES } from "@/lib/supabase/types";
 import type { Skill, Review } from "@/lib/supabase/types";
+import { AddToStackButton } from "@/components/skills/AddToStackButton";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -301,6 +302,9 @@ export default async function SkillDetailPage({ params }: Props) {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Add to Stack */}
+          <AddToStackButton skillId={typedSkill.id} />
+
           {/* Quick info */}
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <h3 className="text-sm font-bold text-foreground">Details</h3>

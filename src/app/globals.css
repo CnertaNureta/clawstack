@@ -3,9 +3,9 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
-  --primary: #0d9488;
-  --primary-light: #14b8a6;
-  --primary-dark: #0f766e;
+  --primary: #0369a1;
+  --primary-light: #0ea5e9;
+  --primary-dark: #075985;
   --accent: #f59e0b;
   --danger: #ef4444;
   --warning: #f97316;
@@ -13,7 +13,8 @@
   --muted: #64748b;
   --border: #e2e8f0;
   --card: #ffffff;
-  --card-hover: #f1f5f9;
+  --card-hover: #f0f9ff;
+  --hero-bg: #0b1120;
 }
 
 @theme inline {
@@ -30,18 +31,23 @@
   --color-border: var(--border);
   --color-card: var(--card);
   --color-card-hover: var(--card-hover);
+  --color-hero-bg: var(--hero-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --border: #334155;
-    --card: #1e293b;
-    --card-hover: #334155;
+    --background: #0b1120;
+    --foreground: #e2e8f0;
+    --primary: #38bdf8;
+    --primary-light: #7dd3fc;
+    --primary-dark: #0ea5e9;
+    --border: #1e3a5f;
+    --card: #0f1d32;
+    --card-hover: #162a46;
     --muted: #94a3b8;
+    --hero-bg: #060a14;
   }
 }
 
@@ -50,9 +56,37 @@ body {
   color: var(--foreground);
 }
 
-/* Smooth transitions */
+/* Smooth transitions for all interactive state changes */
 * {
-  transition-property: background-color, border-color, box-shadow;
+  transition-property: background-color, border-color, box-shadow, color, opacity;
   transition-duration: 150ms;
   transition-timing-function: ease;
+}
+
+/* Entrance animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out both;
+}
+
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
 }

@@ -5,6 +5,22 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/";
+  const provider = searchParams.get("provider");
+
+  // Initiate OAuth flow when provider is specified but no code yet
+  if (provider === "github" && !code) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${origin}/api/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    });
+    if (data?.url) {
+      return NextResponse.redirect(data.url);
+    }
+    return NextResponse.redirect(`${origin}/?error=auth_init_failed`);
+  }
 
   if (code) {
     const supabase = await createClient();

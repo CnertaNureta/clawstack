@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SearchBar } from "./SearchBar";
+import { UserNav } from "./UserNav";
 
 function ClawStackLogo() {
   return (
@@ -59,9 +60,10 @@ export function Header() {
           </Link>
           <Link
             href="/security"
-            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 sm:block"
+            className="relative hidden rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 sm:block"
           >
             Security
+            <span className="absolute right-1 top-1.5 h-1.5 w-1.5 rounded-full bg-red-500" />
           </Link>
           <Link
             href="/collections"
@@ -69,12 +71,7 @@ export function Header() {
           >
             Collections
           </Link>
-          <a
-            href="/api/auth/callback?provider=github"
-            className="ml-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
-          >
-            Sign In
-          </a>
+          <UserNav />
         </nav>
       </div>
 

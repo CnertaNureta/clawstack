@@ -90,6 +90,7 @@ export default async function SecurityReportPage() {
           bg="bg-primary/10"
           value={total.toLocaleString()}
           label="Skills Analyzed"
+          href="/skills"
         />
         <StatCard
           icon={<AlertIcon className="h-6 w-6 text-red-600" />}
@@ -97,6 +98,7 @@ export default async function SecurityReportPage() {
           value={dangerous.toString()}
           label="Flagged Dangerous (D)"
           highlight="text-red-700"
+          href="/skills?grade=D&sort=security"
         />
         <StatCard
           icon={<WarningIcon className="h-6 w-6 text-orange-600" />}
@@ -104,6 +106,7 @@ export default async function SecurityReportPage() {
           value={`${riskPct}%`}
           label="Have Risk Flags (C/D)"
           highlight="text-orange-700"
+          href="/skills?grade=C,D&sort=security"
         />
         <StatCard
           icon={<CheckIcon className="h-6 w-6 text-emerald-600" />}
@@ -111,6 +114,7 @@ export default async function SecurityReportPage() {
           value={safeCount.toLocaleString()}
           label="Rated Safe (S/A)"
           highlight="text-emerald-700"
+          href="/skills?grade=S,A&sort=security"
         />
       </div>
 
@@ -327,24 +331,44 @@ function StatCard({
   value,
   label,
   highlight,
+  href,
 }: {
   icon: React.ReactNode;
   bg: string;
   value: string;
   label: string;
   highlight?: string;
+  href?: string;
 }) {
+  const content = (
+    <div className="flex items-center gap-3">
+      <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${bg}`}>
+        {icon}
+      </div>
+      <div>
+        <div className={`text-2xl font-bold ${highlight || "text-foreground"}`}>{value}</div>
+        <div className="text-xs text-muted">{label}</div>
+      </div>
+    </div>
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="group rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
+      >
+        {content}
+        <div className="mt-2 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+          View skills &rarr;
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${bg}`}>
-          {icon}
-        </div>
-        <div>
-          <div className={`text-2xl font-bold ${highlight || "text-foreground"}`}>{value}</div>
-          <div className="text-xs text-muted">{label}</div>
-        </div>
-      </div>
+      {content}
     </div>
   );
 }

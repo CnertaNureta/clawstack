@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,6 +27,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: {
+      "msvalidate.01": process.env.BING_SITE_VERIFICATION || "",
+    },
+  },
   openGraph: {
     type: "website",
     siteName: "ClawStack",
@@ -76,6 +84,8 @@ export default function RootLayout({
           <main className="min-h-screen">{children}</main>
           <Footer />
         </AuthProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

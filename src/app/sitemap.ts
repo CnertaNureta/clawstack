@@ -5,7 +5,7 @@ import { CATEGORIES } from "@/lib/supabase/types";
 const GRADES = ["s", "a", "b", "c", "d"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh";
   const supabase = await createClient();
 
   // Static pages

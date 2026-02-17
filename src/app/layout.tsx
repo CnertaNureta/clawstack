@@ -54,7 +54,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh";
 
   const jsonLd = {
     "@context": "https://schema.org",

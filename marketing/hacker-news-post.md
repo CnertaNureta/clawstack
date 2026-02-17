@@ -8,7 +8,7 @@ Show HN: ClawStack — We scanned 6,493 OpenClaw skills and 40% have security is
 
 Hey HN,
 
-I built ClawStack (https://clawstack.dev) after discovering that nearly half of the OpenClaw skills available on ClawHub had never been independently audited for security.
+I built ClawStack (https://clawstack.sh) after discovering that nearly half of the OpenClaw skills available on ClawHub had never been independently audited for security.
 
 **What we found scanning 6,493 skills:**
 
@@ -34,7 +34,7 @@ Grades: S (90+) / A (75-89) / B (60-74) / C (40-59) / D (<40)
 
 - Browse all 6,493 skills with security ratings
 - Filter by grade, category, trending
-- Create your "Stack" — share what skills you use at clawstack.dev/@username
+- Create your "Stack" — share what skills you use at clawstack.sh/@username
 - 22 curated collections (Safest Skills, Skills to Avoid, Best for Devs, etc.)
 - Skill Recommendation Quiz
 

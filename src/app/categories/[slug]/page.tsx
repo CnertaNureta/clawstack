@@ -117,7 +117,7 @@ export default async function CategoryPage({ params }: Props) {
     .order("upvotes", { ascending: false })
     .limit(48);
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh";
 
   const jsonLd = {
     "@context": "https://schema.org",

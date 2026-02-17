@@ -98,7 +98,7 @@ export default async function SkillDetailPage({ params }: Props) {
     (g) => g.grade === typedSkill.security_grade
   );
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",

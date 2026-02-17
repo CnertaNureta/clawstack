@@ -208,7 +208,7 @@ export async function GET(request: NextRequest) {
                 marginLeft: "auto",
               }}
             >
-              clawstack.dev/u/{username}
+              clawstack.sh/u/{username}
             </div>
           </div>
         </div>
@@ -299,7 +299,7 @@ export async function GET(request: NextRequest) {
                 marginLeft: "auto",
               }}
             >
-              clawstack.dev/quiz
+              clawstack.sh/quiz
             </div>
           </div>
         </div>
@@ -452,7 +452,7 @@ export async function GET(request: NextRequest) {
               marginLeft: "auto",
             }}
           >
-            clawstack.dev/skills/{slug}
+            clawstack.sh/skills/{slug}
           </div>
         </div>
       </div>

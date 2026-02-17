@@ -9,7 +9,7 @@ I scanned every OpenClaw skill on ClawHub for security threats — here's what I
 
 ### Body
 
-I built ClawStack (https://clawstack.dev), a security-focused skill discovery platform that rates all 6,493 OpenClaw skills.
+I built ClawStack (https://clawstack.sh), a security-focused skill discovery platform that rates all 6,493 OpenClaw skills.
 
 **The scary numbers:**
 - 502 skills got a D grade (Dangerous)
@@ -31,7 +31,7 @@ Every skill gets a 0-100 score based on:
 - Create your own "Stack" page showing what you use
 - Browse curated collections like "Safest Skills" and "Skills to Avoid"
 
-Check the full security report: https://clawstack.dev/security
+Check the full security report: https://clawstack.sh/security
 
 Feedback welcome — especially on scoring accuracy. If your skill got unfairly rated, let me know and I'll investigate.
 
@@ -46,7 +46,7 @@ Built a trust-scoring platform for OpenClaw skills after finding 500+ with secur
 
 If you're running OpenClaw skills on your home server, you probably want to know which ones are safe.
 
-I built ClawStack (https://clawstack.dev) — think of it as a security audit for the entire OpenClaw ecosystem.
+I built ClawStack (https://clawstack.sh) — think of it as a security audit for the entire OpenClaw ecosystem.
 
 **Key findings from scanning 6,493 skills:**
 - 502 rated Dangerous (Grade D)
@@ -57,7 +57,7 @@ We use Cisco's mcp-scanner YARA engine for real threat detection. Each skill get
 
 Free to use, no account needed to browse. You can also create a profile showing your stack of trusted skills.
 
-https://clawstack.dev/security — full security report with methodology
+https://clawstack.sh/security — full security report with methodology
 
 ---
 
@@ -91,7 +91,7 @@ Grade scale: S (90+) / A (75-89) / B (60-74) / C (40-59) / D (<40)
 - Several skills named to look like legitimate tools are actually credential harvesters
 - Skills promising "one API key for 70+ AI models" consistently flag for DATA EXFILTRATION
 
-Full results browsable at https://clawstack.dev/security
+Full results browsable at https://clawstack.sh/security
 
 Happy to discuss methodology or share more detailed data.
 

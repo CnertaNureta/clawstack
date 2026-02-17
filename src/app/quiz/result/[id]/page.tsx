@@ -193,7 +193,7 @@ export default async function QuizResultPage({ params }: Props) {
             <input
               type="text"
               readOnly
-              value={`${process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.dev"}/quiz/result/${id}`}
+              value={`${process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh"}/quiz/result/${id}`}
               className="w-full max-w-md rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground"
             />
           </div>

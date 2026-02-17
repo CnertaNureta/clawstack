@@ -14,7 +14,7 @@ dotenv.config({ path: path.join(__dirname, "..", ".env.local") });
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack-phi.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh";
 const INDEXNOW_KEY = "fe86810d48b55ee78919c7860d0ccbc5";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);

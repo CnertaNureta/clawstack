@@ -25,7 +25,7 @@ ClawStack gives every skill a security grade (S/A/B/C/D) based on 6-dimensional 
 - Browse 6,493 skills with security ratings
 - Filter by grade, category, trending
 - 22 curated collections (Safest Skills, Skills to Avoid, etc.)
-- My Stack — share what you use at clawstack.dev/@you
+- My Stack — share what you use at clawstack.sh/@you
 - Skill Recommendation Quiz
 - Full security report with methodology
 

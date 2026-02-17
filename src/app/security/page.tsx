@@ -303,7 +303,7 @@ export default async function SecurityReportPage() {
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("We scanned 6,400+ OpenClaw skills for security risks. Here's what we found:\n\nclawstack.dev/security")}`}
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("We scanned 6,400+ OpenClaw skills for security risks. Here's what we found:\n\nclawstack.sh/security")}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-primary shadow-lg hover:bg-gray-50"
@@ -312,7 +312,7 @@ export default async function SecurityReportPage() {
             Share on X
           </a>
           <a
-            href={`https://www.reddit.com/submit?url=${encodeURIComponent("https://clawstack.dev/security")}&title=${encodeURIComponent("State of OpenClaw Security: We scanned 6,400+ skills")}`}
+            href={`https://www.reddit.com/submit?url=${encodeURIComponent("https://clawstack.sh/security")}&title=${encodeURIComponent("State of OpenClaw Security: We scanned 6,400+ skills")}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-white/20 px-6 py-3 font-semibold text-white backdrop-blur-sm hover:bg-white/30"

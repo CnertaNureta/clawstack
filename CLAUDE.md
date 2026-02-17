@@ -75,7 +75,7 @@ Grades: S / A / B / C / D displayed as badge on each skill card
 - Updated daily for retention
 
 ### 3.4 My Stack (Viral growth engine)
-- Users select skills they use → generate personal Stack page at clawstack.dev/@username
+- Users select skills they use → generate personal Stack page at clawstack.sh/@username
 - Shows avatar + bio + skills list + overall security score
 - OG Image for Twitter/X sharing
 - Viral loop: create Stack → share → others see → create their own

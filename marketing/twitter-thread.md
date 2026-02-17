@@ -81,9 +81,9 @@ So we built ClawStack — a trusted skill discovery platform.
 - 22 curated collections
 
 ### Tweet 9 (CTA)
-Check the full security report: https://clawstack.dev/security
+Check the full security report: https://clawstack.sh/security
 
-Browse all skills with ratings: https://clawstack.dev/skills
+Browse all skills with ratings: https://clawstack.sh/skills
 
 Create your stack: Sign in with GitHub
 
@@ -92,7 +92,7 @@ The OpenClaw ecosystem needs trust infrastructure.
 
 We're building it.
 
-https://clawstack.dev
+https://clawstack.sh
 
 ---
 

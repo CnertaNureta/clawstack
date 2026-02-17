@@ -34,12 +34,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // All skill pages
-  const { data: skills } = await supabase
-    .from("skills")
-    .select("slug, updated_at");
+  // All skill pages (paginated to bypass Supabase 1000-row default limit)
+  const allSkills: { slug: string; updated_at: string }[] = [];
+  const PAGE_SIZE = 1000;
+  let from = 0;
+  while (true) {
+    const { data } = await supabase
+      .from("skills")
+      .select("slug, updated_at")
+      .range(from, from + PAGE_SIZE - 1);
+    if (!data || data.length === 0) break;
+    allSkills.push(...data);
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
 
-  const skillPages: MetadataRoute.Sitemap = (skills || []).map((skill) => ({
+  const skillPages: MetadataRoute.Sitemap = allSkills.map((skill) => ({
     url: `${baseUrl}/skills/${skill.slug}`,
     lastModified: new Date(skill.updated_at),
     changeFrequency: "weekly" as const,

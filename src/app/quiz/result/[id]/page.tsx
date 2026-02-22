@@ -1,37 +1,29 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SkillCard } from "@/components/skills/SkillCard";
 import { InstallCommand } from "@/components/skills/InstallCommand";
+import QuizResultActions from "@/components/quiz/QuizResultActions";
 import type { Skill } from "@/lib/supabase/types";
+import {
+  ANONYMOUS_QUIZ_RESULT_ID,
+  buildQuizResultPayload,
+  buildQuizResultSharePath,
+  readQuizResultPayloadFromSearchParams,
+} from "@/lib/quiz/resultLink";
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const supabase = await createClient();
-  const { data: result } = await supabase
-    .from("quiz_results")
-    .select("role, platform, goal, recommended_skill_ids")
-    .eq("id", id)
-    .single();
-
-  if (!result) return { title: "Quiz Result Not Found" };
-
-  const count = result.recommended_skill_ids?.length || 0;
-
-  return {
-    title: `Your OpenClaw Recommendations — ${count} Skills`,
-    description: `Personalized OpenClaw skill recommendations for a ${result.role} using ${result.platform} to automate ${result.goal}. ${count} safe, trusted skills selected.`,
-    openGraph: {
-      title: `${count} Skills Picked For You`,
-      description: `Personalized for: ${result.role} • ${result.platform} • ${result.goal}`,
-      images: [`/api/og?type=quiz&id=${id}`],
-    },
-  };
+interface StoredQuizResult {
+  id: string;
+  role: string | null;
+  platform: string | null;
+  goal: string | null;
+  recommended_skill_ids: string[] | null;
+  created_at?: string | null;
 }
 
 const roleLabels: Record<string, string> = {
@@ -59,32 +51,90 @@ const goalLabels: Record<string, string> = {
   security: "Security",
 };
 
-export default async function QuizResultPage({ params }: Props) {
-  const { id } = await params;
-  const supabase = await createClient();
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh";
 
-  const { data: result } = await supabase
+function toPayload(result: StoredQuizResult | null | undefined) {
+  return buildQuizResultPayload({
+    role: result?.role || "Unknown role",
+    platform: result?.platform || "Unknown platform",
+    goal: result?.goal || "Unknown goal",
+    recommended_skill_ids: result?.recommended_skill_ids || [],
+    created_at: result?.created_at,
+  });
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: Props): Promise<Metadata> {
+  const { id } = await params;
+  const paramsObj = await searchParams;
+
+  const sharedPayload = readQuizResultPayloadFromSearchParams(paramsObj);
+  const supabase = await createClient();
+  const { data: result, error } = await supabase
+    .from("quiz_results")
+    .select("role, platform, goal, recommended_skill_ids")
+    .eq("id", id)
+    .single();
+
+  const savedResult = error || !result ? null : (result as StoredQuizResult);
+  const current = savedResult ?? sharedPayload;
+
+  if (!current) return { title: "Quiz Result Not Found" };
+
+  const count = current.recommended_skill_ids?.length || 0;
+
+  return {
+    title: `Your OpenClaw Recommendations — ${count} Skills`,
+    description: `Personalized OpenClaw skill recommendations for a ${current.role} using ${current.platform} to automate ${current.goal}. ${count} safe, trusted skills selected.`,
+    openGraph: {
+      title: `${count} Skills Picked For You`,
+      description: `Personalized for: ${current.role} • ${current.platform} • ${current.goal}`,
+      images:
+        id !== ANONYMOUS_QUIZ_RESULT_ID ? [`/api/og?type=quiz&id=${id}`] : [],
+    },
+  };
+}
+
+export default async function QuizResultPage({ params, searchParams }: Props) {
+  const { id } = await params;
+  const paramsObj = await searchParams;
+  const sharedPayload = readQuizResultPayloadFromSearchParams(paramsObj);
+
+  const supabase = await createClient();
+  const { data: rawResult, error } = await supabase
     .from("quiz_results")
     .select("*")
     .eq("id", id)
     .single();
 
-  if (!result) notFound();
+  if (error && error.code !== "PGRST116") {
+    console.error("Failed to load quiz result:", error);
+  }
+
+  const savedResult = rawResult ? (rawResult as StoredQuizResult) : null;
+  const current = savedResult ?? sharedPayload;
+
+  if (!current) notFound();
+
+  const payload = toPayload(current);
+  const ids = payload.recommended_skill_ids;
 
   let skills: Skill[] = [];
-  if (result.recommended_skill_ids && result.recommended_skill_ids.length > 0) {
-    const { data } = await supabase
-      .from("skills")
-      .select("*")
-      .in("id", result.recommended_skill_ids);
+  if (ids.length > 0) {
+    const { data } = await supabase.from("skills").select("*").in("id", ids);
     skills = (data as Skill[]) || [];
   }
 
-  // Build combined install commands
   const installCommands = skills
     .filter((s) => s.install_command)
     .map((s) => s.install_command!)
     .join(" && ");
+
+  const isAnonymous = !savedResult;
+  const resultPath = buildQuizResultSharePath(id, payload);
+  const resultUrl = `${baseUrl}${resultPath}`;
 
   return (
     <div>
@@ -124,21 +174,26 @@ export default async function QuizResultPage({ params }: Props) {
 
           <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-3">
             <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-slate-300">
-              {roleLabels[result.role] || result.role}
+              {roleLabels[payload.role] || payload.role}
             </span>
             <span className="text-slate-600">•</span>
             <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-slate-300">
-              {platformLabels[result.platform] || result.platform}
+              {platformLabels[payload.platform] || payload.platform}
             </span>
             <span className="text-slate-600">•</span>
             <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-slate-300">
-              {goalLabels[result.goal] || result.goal}
+              {goalLabels[payload.goal] || payload.goal}
             </span>
           </div>
 
           <p className="mt-4 text-slate-400">
             All recommended skills have a safety grade of B or higher.
           </p>
+          {isAnonymous && (
+            <p className="mt-2 text-xs text-amber-200">
+              This result is shareable and not persisted to your account yet.
+            </p>
+          )}
         </div>
       </section>
 
@@ -162,42 +217,13 @@ export default async function QuizResultPage({ params }: Props) {
           ))}
         </div>
 
-        {/* CTAs */}
-        <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Link
-            href="/quiz"
-            className="rounded-lg border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-card-hover"
-          >
-            Retake Quiz
-          </Link>
-          <a
-            href="/api/auth/callback?provider=github"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
-          >
-            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-            </svg>
-            Save to My Stack
-          </a>
-        </div>
-
-        {/* Share section */}
-        <div className="mt-10 rounded-xl border border-border bg-card p-6 text-center">
-          <h3 className="text-sm font-bold text-foreground">
-            Share your results
-          </h3>
-          <p className="mt-1 text-sm text-muted">
-            Let others discover the best skills for their needs too.
-          </p>
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <input
-              type="text"
-              readOnly
-              value={`${process.env.NEXT_PUBLIC_SITE_URL || "https://clawstack.sh"}/quiz/result/${id}`}
-              className="w-full max-w-md rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground"
-            />
-          </div>
-        </div>
+        <QuizResultActions
+          resultPath={resultPath}
+          resultLink={resultUrl}
+          resultId={id}
+          skillCount={skills.length}
+          isAnonymous={isAnonymous}
+        />
       </div>
     </div>
   );

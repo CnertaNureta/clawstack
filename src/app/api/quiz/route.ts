@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { buildQuizResultPayload } from "@/lib/quiz/resultLink";
 import { NextRequest, NextResponse } from "next/server";
 
 // Map user answers to skill categories and tags
@@ -50,13 +51,15 @@ export async function POST(request: NextRequest) {
 
   const { data: tagMatched } = await query.limit(8);
 
-  let skills = tagMatched || [];
+  const skills = tagMatched || [];
 
   // If not enough results with tag filter, broaden search
   if (skills.length < 4) {
     const { data: broader } = await supabase
       .from("skills")
-      .select("id, slug, name, description, category, security_grade, security_score, upvotes, tags")
+      .select(
+        "id, slug, name, description, category, security_grade, security_score, upvotes, tags"
+      )
       .in("category", Array.from(categories))
       .in("security_grade", ["S", "A", "B"])
       .order("upvotes", { ascending: false })
@@ -77,7 +80,9 @@ export async function POST(request: NextRequest) {
   if (skills.length < 4) {
     const { data: fallback } = await supabase
       .from("skills")
-      .select("id, slug, name, description, category, security_grade, security_score, upvotes, tags")
+      .select(
+        "id, slug, name, description, category, security_grade, security_score, upvotes, tags"
+      )
       .in("security_grade", ["S", "A"])
       .order("upvotes", { ascending: false })
       .limit(8);
@@ -89,26 +94,44 @@ export async function POST(request: NextRequest) {
         existingIds.add(s.id);
       }
       if (skills.length >= 8) break;
-    }
+      }
   }
 
   const recommendedIds = skills.map((s) => s.id);
+  const payload = buildQuizResultPayload({
+    role,
+    platform,
+    goal,
+    recommended_skill_ids: recommendedIds,
+  });
 
-  // Save quiz result
-  const { data: result, error } = await supabase
-    .from("quiz_results")
-    .insert({
-      role,
-      platform,
-      goal,
-      recommended_skill_ids: recommendedIds,
-    })
-    .select("id")
-    .single();
+  let resultId: string | null = null;
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    const { data: result, error } = await supabase
+      .from("quiz_results")
+      .insert({
+        role,
+        platform,
+        goal,
+        recommended_skill_ids: recommendedIds,
+      })
+      .select("id")
+      .single();
+
+    if (!error && result?.id) {
+      resultId = result.id;
+    } else if (error) {
+      console.error("Failed to persist quiz result:", error.message);
+    }
+  } catch (error) {
+    console.error("Failed to persist quiz result:", error);
   }
 
-  return NextResponse.json({ id: result.id, skills });
+  return NextResponse.json({
+    id: resultId,
+    skills,
+    payload,
+    saved: Boolean(resultId),
+  });
 }

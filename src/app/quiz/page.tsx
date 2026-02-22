@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Metadata } from "next";
+import { trackEvent } from "@/lib/analytics";
+import { ANONYMOUS_QUIZ_RESULT_ID, buildQuizResultSharePath } from "@/lib/quiz/resultLink";
 
 const STEPS = [
   {
@@ -49,6 +50,14 @@ export default function QuizPage() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const hasTrackedStart = useRef(false);
+
+  useEffect(() => {
+    if (!hasTrackedStart.current) {
+      trackEvent("quiz_start");
+      hasTrackedStart.current = true;
+    }
+  }, []);
 
   const current = STEPS[step];
 
@@ -56,27 +65,45 @@ export default function QuizPage() {
     const updated = { ...answers, [current.key]: value };
     setAnswers(updated);
 
-    if (step < STEPS.length - 1) {
-      setStep(step + 1);
-    } else {
-      // Submit
-      setLoading(true);
-      try {
-        const res = await fetch("/api/quiz", {
+        if (step < STEPS.length - 1) {
+          setStep(step + 1);
+        } else {
+          // Submit
+          setLoading(true);
+          try {
+            const res = await fetch("/api/quiz", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updated),
-        });
-        const data = await res.json();
-        if (data.id) {
-          router.push(`/quiz/result/${data.id}`);
+            });
+            const data = await res.json();
+
+            const sharePath = buildQuizResultSharePath(
+              data.id || ANONYMOUS_QUIZ_RESULT_ID,
+              data.payload
+            );
+
+            trackEvent("quiz_complete", {
+              quiz_id: data.id || "anonymous",
+              anonymous: !data.id,
+              role: updated.role,
+              platform: updated.platform,
+              goal: updated.goal,
+              saved: Boolean(data.saved),
+              recommendation_count: STEPS.length,
+            });
+
+            if (data.id || data.payload) {
+              router.push(sharePath);
+            } else {
+              throw new Error("Missing quiz payload");
+            }
+          } catch (err) {
+            console.error("Quiz submit failed:", err);
+            setLoading(false);
+          }
         }
-      } catch (err) {
-        console.error("Quiz submit failed:", err);
-        setLoading(false);
-      }
-    }
-  };
+      };
 
   const progress = ((step + 1) / STEPS.length) * 100;
 

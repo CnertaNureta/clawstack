@@ -117,6 +117,21 @@ export default async function HomePage() {
             skills. Know what you&apos;re installing.
           </p>
 
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/quiz"
+              className="inline-flex items-center rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
+            >
+              Start Quiz
+            </Link>
+            <Link
+              href="/security"
+              className="inline-flex items-center rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20"
+            >
+              View Security Report
+            </Link>
+          </div>
+
           {/* Search */}
           <div className="animate-fade-in-up animation-delay-300 mx-auto mt-8 max-w-xl">
             <div className="rounded-xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-sm">

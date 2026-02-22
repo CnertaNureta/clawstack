@@ -175,7 +175,7 @@ async function main() {
   console.log("\nRecalculating security scores...\n");
   let updated = 0;
   let unchanged = 0;
-  let gradeChanges: Record<string, number> = {};
+  const gradeChanges: Record<string, number> = {};
 
   // Process in batches
   const updateBatch: { id: string; security_score: number; security_grade: string; security_details: Record<string, number> }[] = [];
